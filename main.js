@@ -12,7 +12,7 @@ const CATEGORIES = {
 };
 
 const state = {
-    patient: { height: 0, weight: 0, age: null, gender: 'male' },
+    patient: { height: 0, weight: 0, age: null, gender: 'male', isPreterm: false },
     selections: {},
     visibility: {},
     customProducts: [],
@@ -210,12 +210,13 @@ function attachGlobalListeners() {
     });
 
     document.addEventListener('input', (e) => {
-        if (e.target.matches('#pt-height, #pt-weight, #pt-age, #pt-gender')) {
+        if (e.target.matches('#pt-height, #pt-weight, #pt-age, #pt-gender, #is-preterm')) {
             state.patient.height = parseFloat(document.getElementById('pt-height').value) || 0;
             state.patient.weight = parseFloat(document.getElementById('pt-weight').value) || 0;
             const ageVal = document.getElementById('pt-age').value;
             state.patient.age = ageVal === '' ? null : parseFloat(ageVal);
             state.patient.gender = document.getElementById('pt-gender').value;
+            state.patient.isPreterm = document.getElementById('is-preterm').checked;
             calculate();
         }
         if (e.target.matches('.item-select, .item-amount')) updateStateFromDOM();
@@ -330,6 +331,38 @@ function calculateNutritionalReq(age, weight) {
     return { fluid, energy, formulaFluid: fFluid, formulaEnergy: fEnergy };
 }
 
+function calculateSchofield(age, weight, gender) {
+    let energy = 0;
+    if (age < 3) {
+        energy = (gender === 'male') ? (59.5 * weight - 30.4) : (58.3 * weight - 31.1);
+    } else if (age < 10) {
+        energy = (gender === 'male') ? (22.7 * weight + 504) : (20.3 * weight + 486);
+    } else {
+        energy = (gender === 'male') ? (17.7 * weight + 658) : (13.4 * weight + 693);
+    }
+    return energy;
+}
+
+function calculateWHO(age, weight, gender) {
+    let energy = 0;
+    if (age < 3) {
+        energy = (gender === 'male') ? (60.9 * weight - 54) : (61.0 * weight - 51);
+    } else if (age < 10) {
+        energy = (gender === 'male') ? (22.7 * weight + 495) : (22.5 * weight + 499);
+    } else {
+        energy = (gender === 'male') ? (17.5 * weight + 651) : (12.2 * weight + 746);
+    }
+    return energy;
+}
+
+function getParenteralEnergyReq(age, isPreterm) {
+    if (isPreterm) return { range: '急性期 45-55 / 回復期 90-120', unit: 'kcal/kg/day' };
+    if (age < 1) return { range: '急性期 45-50 / 安定期 60-65 / 回復期 75-85', unit: 'kcal/kg/day' };
+    if (age < 7) return { range: '急性期 40-45 / 安定期 55-60 / 回復期 65-75', unit: 'kcal/kg/day' };
+    if (age < 12) return { range: '急性期 30-40 / 安定期 40-55 / 回復期 55-65', unit: 'kcal/kg/day' };
+    return { range: '急性期 20-30 / 安定期 25-40 / 回復期 30-55', unit: 'kcal/kg/day' };
+}
+
 function calculate() {
     let totals = { kcal: 0, protein: 0, water: 0, volume: 0, na: 0, fe: 0, zn: 0, cu: 0, mn: 0, i: 0, b1: 0, carnitine: 0 };
     let subEnteral = 0; let subPN = 0;
@@ -369,7 +402,11 @@ function calculate() {
             tKcalAct = req.energy;
             tKcalIbw = ibw * (req.energy / weight);
             
-            const formulaContent = `[標準体重]\n${std.formula}\n\n[必要水分量]\n${req.formulaFluid}\n目安: ${req.fluid.toFixed(0)} mL/day\n\n[必要エネルギー]\n${req.formulaEnergy}\n目安: ${req.energy.toFixed(0)} kcal/day`;
+            const schofield = calculateSchofield(age, weight, gender);
+            const who = calculateWHO(age, weight, gender);
+            const pnReq = getParenteralEnergyReq(age, state.patient.isPreterm);
+
+            const formulaContent = `[標準体重]\n${std.formula}\n\n[必要水分量]\n${req.formulaFluid}\n目安: ${req.fluid.toFixed(0)} mL/day\n\n[必要エネルギー (推定)]\n${req.formulaEnergy}\n目安: ${req.energy.toFixed(0)} kcal/day\n\n[Schofieldの式]\n${schofield.toFixed(0)} kcal/day\n\n[WHOの式]\n${who.toFixed(0)} kcal/day\n(出典: 日本版重症患者の栄養療法ガイドライン2024)\n\n[目標エネルギー量 (経静脈栄養)]\n${pnReq.range} ${pnReq.unit}\n(出典: ESPGHAN/ESPEN/ESPR/CSPEN guidelines 2018)`;
             
             // 設定画面側の表示
             const fDisplay = document.getElementById('pediatric-formulas');
