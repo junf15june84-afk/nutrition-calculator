@@ -194,6 +194,8 @@ function attachGlobalListeners() {
         settingsList.addEventListener('change', (e) => {
             if (e.target.classList.contains('visibility-toggle')) {
                 state.visibility[e.target.dataset.name] = e.target.checked;
+                saveSettings(); // 即座に保存
+                renderItems();  // 計算機のドロップダウンを更新
             }
         });
         settingsList.addEventListener('click', (e) => {
