@@ -75,7 +75,7 @@ label {
     color: #4b5563;
 }
 
-input, select {
+input[type="text"], input[type="number"], select {
     width: 100%;
     min-height: 44px; /* iOSのタップターゲット基準 */
     padding: 8px 12px;
@@ -87,6 +87,16 @@ input, select {
     color: #1f2937;
     -webkit-appearance: none; /* Safariのデフォルトスタイルをリセット */
     appearance: none;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    min-height: 20px;
+    -webkit-appearance: auto;
+    appearance: auto;
+    cursor: pointer;
+    margin: 0;
 }
 
 select {
