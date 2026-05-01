@@ -70,6 +70,7 @@ body {
 label {
     display: block;
     font-size: 0.85rem;
+    line-height: 1.2;
     font-weight: 500;
     margin-bottom: 5px;
     color: #4b5563;
