@@ -291,10 +291,28 @@ function updateStateFromDOM() {
     Object.keys(CATEGORIES).forEach(category => {
         const container = document.getElementById(`container-${category}`);
         if (!container) return;
-        state.selections[category] = Array.from(container.querySelectorAll('.item-row')).map(row => ({
-            name: row.querySelector('.item-select').value,
-            amount: parseFloat(row.querySelector('.item-amount').value) || 0
-        }));
+        state.selections[category] = Array.from(container.querySelectorAll('.item-row')).map(row => {
+            const name = row.querySelector('.item-select').value;
+            const amount = parseFloat(row.querySelector('.item-amount').value) || 0;
+            
+            // 選択された製剤に応じて単位と個別カロリーを動的に更新
+            const p = PRODUCT_DB[category].find(x => x.name === name);
+            const unitLabel = row.querySelector('.unit-label');
+            if (unitLabel && p) {
+                unitLabel.textContent = p.unit || 'mL';
+            }
+            
+            const detailsDiv = row.querySelector('.item-details');
+            if (detailsDiv && p && amount > 0) {
+                const k = p.kcal * amount;
+                const pro = p.protein * amount;
+                detailsDiv.textContent = `(${k.toFixed(0)}kcal, P:${pro.toFixed(1)}g)`;
+            } else if (detailsDiv) {
+                detailsDiv.textContent = '';
+            }
+
+            return { name, amount };
+        });
     });
     calculate();
 }
