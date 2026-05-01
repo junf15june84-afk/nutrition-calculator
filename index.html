@@ -46,13 +46,11 @@
                             <label for="pt-id">ID</label>
                             <input type="text" id="pt-id" placeholder="123456">
                         </div>
-                        <div class="input-group">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                                <label for="pt-age" style="margin-bottom: 0;">年齢 (歳)</label>
-                                <label style="display: flex; align-items: center; gap: 4px; font-size: 0.75rem; white-space: nowrap; margin-bottom: 0; cursor: pointer; color: #6b7280;">
-                                    <input type="checkbox" id="is-preterm" style="width: auto; margin: 0;"> 早産児
-                                </label>
-                            </div>
+                        <div class="input-group" style="position: relative;">
+                            <label for="pt-age">年齢 (歳)</label>
+                            <label style="position: absolute; right: 0; top: 0; display: flex; align-items: center; gap: 4px; font-size: 0.75rem; white-space: nowrap; margin-bottom: 0; cursor: pointer; color: #6b7280;">
+                                <input type="checkbox" id="is-preterm" style="width: auto; height: 16px; min-height: 16px; margin: 0;"> 早産児
+                            </label>
                             <input type="number" id="pt-age" placeholder="25">
                         </div>
                         <div class="input-group">
