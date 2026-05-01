@@ -370,12 +370,18 @@ function calculateWHO(age, weight, gender) {
     return { energy, formula };
 }
 
-function getParenteralEnergyReq(age, isPreterm) {
-    if (isPreterm) return { range: '急性期 45-55 / 回復期 90-120', unit: 'kcal/kg/day' };
-    if (age < 1) return { range: '急性期 45-50 / 安定期 60-65 / 回復期 75-85', unit: 'kcal/kg/day' };
-    if (age < 7) return { range: '急性期 40-45 / 安定期 55-60 / 回復期 65-75', unit: 'kcal/kg/day' };
-    if (age < 12) return { range: '急性期 30-40 / 安定期 40-55 / 回復期 55-65', unit: 'kcal/kg/day' };
-    return { range: '急性期 20-30 / 安定期 25-40 / 回復期 30-55', unit: 'kcal/kg/day' };
+function getParenteralEnergyReq(age, weight, isPreterm) {
+    let ranges = [];
+    if (isPreterm) ranges = [{label: '急性期', min: 45, max: 55}, {label: '回復期', min: 90, max: 120}];
+    else if (age < 1) ranges = [{label: '急性期', min: 45, max: 50}, {label: '安定期', min: 60, max: 65}, {label: '回復期', min: 75, max: 85}];
+    else if (age < 7) ranges = [{label: '急性期', min: 40, max: 45}, {label: '安定期', min: 55, max: 60}, {label: '回復期', min: 65, max: 75}];
+    else if (age < 12) ranges = [{label: '急性期', min: 30, max: 40}, {label: '安定期', min: 40, max: 55}, {label: '回復期', min: 55, max: 65}];
+    else ranges = [{label: '急性期', min: 20, max: 30}, {label: '安定期', min: 25, max: 40}, {label: '回復期', min: 30, max: 55}];
+
+    let baseRangeStr = ranges.map(r => `${r.label} ${r.min}-${r.max}`).join(' / ') + ' kcal/kg/day';
+    let calcStr = ranges.map(r => `${r.label}: ${(r.min * weight).toFixed(0)}〜${(r.max * weight).toFixed(0)} kcal/day`).join('\n');
+    
+    return `${baseRangeStr}\n${calcStr}`;
 }
 
 function calculate() {
@@ -419,9 +425,9 @@ function calculate() {
             
             const schofield = calculateSchofield(age, weight, gender);
             const who = calculateWHO(age, weight, gender);
-            const pnReq = getParenteralEnergyReq(age, state.patient.isPreterm);
+            const pnReq = getParenteralEnergyReq(age, weight, state.patient.isPreterm);
 
-            const formulaContent = `[標準体重]\n${std.formula}\n\n[必要水分量]\n${req.formulaFluid}\n目安: ${req.fluid.toFixed(0)} mL/day\n\n[必要エネルギー (推定)]\n${req.formulaEnergy}\n目安: ${req.energy.toFixed(0)} kcal/day\n\n[Schofieldの式]\n${schofield.formula}\n結果: ${schofield.energy.toFixed(0)} kcal/day\n\n[WHOの式]\n${who.formula}\n結果: ${who.energy.toFixed(0)} kcal/day\n(出典: 日本版重症患者の栄養療法ガイドライン2024)\n\n[目標エネルギー量 (経静脈栄養)]\n${pnReq.range} ${pnReq.unit}\n(出典: ESPGHAN/ESPEN/ESPR/CSPEN guidelines 2018)`;
+            const formulaContent = `[標準体重]\n${std.formula}\n\n[必要水分量]\n${req.formulaFluid}\n目安: ${req.fluid.toFixed(0)} mL/day\n\n[必要エネルギー (推定)]\n${req.formulaEnergy}\n目安: ${req.energy.toFixed(0)} kcal/day\n\n[Schofieldの式]\n${schofield.formula}\n結果: ${schofield.energy.toFixed(0)} kcal/day\n\n[WHOの式]\n${who.formula}\n結果: ${who.energy.toFixed(0)} kcal/day\n(出典: 日本版重症患者の栄養療法ガイドライン2024)\n\n[目標エネルギー量 (経静脈栄養)]\n${pnReq}\n(出典: ESPGHAN/ESPEN/ESPR/CSPEN guidelines 2018)`;
             
             // 設定画面側の表示
             const fDisplay = document.getElementById('pediatric-formulas');
