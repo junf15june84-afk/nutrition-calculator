@@ -495,6 +495,21 @@ function generateSummary() {
     if (age !== null) lines.push(`年齢: ${age}歳`);
     if (height > 0 || weight > 0) lines.push(`身長: ${height}cm / 体重: ${weight}kg (BMI: ${document.getElementById('disp-bmi').textContent})`);
     
+    const targetAct = document.getElementById('target-kcal-act').textContent;
+    const targetIbw = document.getElementById('target-kcal-ibw').textContent;
+    if (targetAct !== '-' && targetAct !== '0') {
+        const targetLabel = document.getElementById('target-kcal-label').textContent.replace(':', '');
+        lines.push(`\n[目標カロリー]`);
+        lines.push(`基準: ${targetLabel}`);
+        lines.push(`・実体重ベース: ${targetAct} kcal / 標準体重ベース: ${targetIbw} kcal`);
+    }
+
+    const fInfo = document.getElementById('pediatric-formula-info');
+    if (fInfo && fInfo.style.display === 'block') {
+        const fText = document.getElementById('pediatric-formula-text').textContent;
+        lines.push(`\n【小児用計算基準の詳細】\n${fText}`);
+    }
+
     lines.push('\n[投与内容]');
     let hasProducts = false;
     Object.keys(CATEGORIES).forEach(cat => {
