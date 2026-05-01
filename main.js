@@ -492,10 +492,29 @@ function calculate() {
 function generateSummary() {
     const lines = ['【栄養管理・輸液計算結果】'];
     const { height, weight, age } = state.patient;
-    if (age) lines.push(`年齢: ${age}歳`);
-    if (height || weight) lines.push(`身長: ${height}cm / 体重: ${weight}kg (BMI: ${document.getElementById('disp-bmi').textContent})`);
+    if (age !== null) lines.push(`年齢: ${age}歳`);
+    if (height > 0 || weight > 0) lines.push(`身長: ${height}cm / 体重: ${weight}kg (BMI: ${document.getElementById('disp-bmi').textContent})`);
+    
+    lines.push('\n[投与内容]');
+    let hasProducts = false;
+    Object.keys(CATEGORIES).forEach(cat => {
+        const selected = state.selections[cat].filter(s => s.name && s.amount > 0);
+        if (selected.length > 0) {
+            hasProducts = true;
+            lines.push(`-- ${CATEGORIES[cat]} --`);
+            selected.forEach(s => {
+                const p = PRODUCT_DB[cat].find(x => x.name === s.name);
+                const unit = p ? p.unit : 'mL';
+                lines.push(`・${s.name}: ${s.amount} ${unit}`);
+            });
+        }
+    });
+    if (!hasProducts) lines.push('（入力なし）');
+
+    lines.push('\n[栄養サマリー]');
     lines.push(`総エネルギー: ${document.getElementById('total-kcal').textContent} kcal (${document.getElementById('kcal-per-kg').textContent})`);
     lines.push(`タンパク質: ${document.getElementById('total-protein').textContent} g (${document.getElementById('protein-per-kg').textContent})`);
+    lines.push(`総水分量: ${document.getElementById('total-water').textContent} mL`);
     return lines.join('\n');
 }
 
