@@ -193,9 +193,10 @@ function attachGlobalListeners() {
     if (settingsList) {
         settingsList.addEventListener('change', (e) => {
             if (e.target.classList.contains('visibility-toggle')) {
-                state.visibility[e.target.dataset.name] = e.target.checked;
-                saveSettings(); // 即座に保存
-                renderItems();  // 計算機のドロップダウンを更新
+                const name = e.target.dataset.name;
+                state.visibility[name] = e.target.checked;
+                saveSettings(); // 即座にLocalStorageに保存
+                renderItems();  // 計算機のドロップダウンをすべて更新
             }
         });
         settingsList.addEventListener('click', (e) => {
@@ -249,6 +250,10 @@ function removeItem(category, index) {
 }
 
 function renderItems(category) {
+    if (!category) {
+        Object.keys(CATEGORIES).forEach(renderItems);
+        return;
+    }
     const container = document.getElementById(`container-${category}`);
     if (!container) return;
     const items = state.selections[category];
