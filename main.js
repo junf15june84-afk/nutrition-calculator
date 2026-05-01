@@ -333,26 +333,34 @@ function calculateNutritionalReq(age, weight) {
 
 function calculateSchofield(age, weight, gender) {
     let energy = 0;
+    let formula = '';
     if (age < 3) {
-        energy = (gender === 'male') ? (59.5 * weight - 30.4) : (58.3 * weight - 31.1);
+        if (gender === 'male') { energy = 59.5 * weight - 30.4; formula = '0〜3歳 男児: 59.5 × 体重 - 30.4'; }
+        else { energy = 58.3 * weight - 31.1; formula = '0〜3歳 女児: 58.3 × 体重 - 31.1'; }
     } else if (age < 10) {
-        energy = (gender === 'male') ? (22.7 * weight + 504) : (20.3 * weight + 486);
+        if (gender === 'male') { energy = 22.7 * weight + 504; formula = '3〜10歳 男児: 22.7 × 体重 + 504'; }
+        else { energy = 20.3 * weight + 486; formula = '3〜10歳 女児: 20.3 × 体重 + 486'; }
     } else {
-        energy = (gender === 'male') ? (17.7 * weight + 658) : (13.4 * weight + 693);
+        if (gender === 'male') { energy = 17.7 * weight + 658; formula = '10〜18歳 男児: 17.7 × 体重 + 658'; }
+        else { energy = 13.4 * weight + 693; formula = '10〜18歳 女児: 13.4 × 体重 + 693'; }
     }
-    return energy;
+    return { energy, formula };
 }
 
 function calculateWHO(age, weight, gender) {
     let energy = 0;
+    let formula = '';
     if (age < 3) {
-        energy = (gender === 'male') ? (60.9 * weight - 54) : (61.0 * weight - 51);
+        if (gender === 'male') { energy = 60.9 * weight - 54; formula = '0〜3歳 男児: 60.9 × 体重 - 54'; }
+        else { energy = 61.0 * weight - 51; formula = '0〜3歳 女児: 61.0 × 体重 - 51'; }
     } else if (age < 10) {
-        energy = (gender === 'male') ? (22.7 * weight + 495) : (22.5 * weight + 499);
+        if (gender === 'male') { energy = 22.7 * weight + 495; formula = '3〜10歳 男児: 22.7 × 体重 + 495'; }
+        else { energy = 22.5 * weight + 499; formula = '3〜10歳 女児: 22.5 × 体重 + 499'; }
     } else {
-        energy = (gender === 'male') ? (17.5 * weight + 651) : (12.2 * weight + 746);
+        if (gender === 'male') { energy = 17.5 * weight + 651; formula = '10〜18歳 男児: 17.5 × 体重 + 651'; }
+        else { energy = 12.2 * weight + 746; formula = '10〜18歳 女児: 12.2 × 体重 + 746'; }
     }
-    return energy;
+    return { energy, formula };
 }
 
 function getParenteralEnergyReq(age, isPreterm) {
@@ -406,7 +414,7 @@ function calculate() {
             const who = calculateWHO(age, weight, gender);
             const pnReq = getParenteralEnergyReq(age, state.patient.isPreterm);
 
-            const formulaContent = `[標準体重]\n${std.formula}\n\n[必要水分量]\n${req.formulaFluid}\n目安: ${req.fluid.toFixed(0)} mL/day\n\n[必要エネルギー (推定)]\n${req.formulaEnergy}\n目安: ${req.energy.toFixed(0)} kcal/day\n\n[Schofieldの式]\n${schofield.toFixed(0)} kcal/day\n\n[WHOの式]\n${who.toFixed(0)} kcal/day\n(出典: 日本版重症患者の栄養療法ガイドライン2024)\n\n[目標エネルギー量 (経静脈栄養)]\n${pnReq.range} ${pnReq.unit}\n(出典: ESPGHAN/ESPEN/ESPR/CSPEN guidelines 2018)`;
+            const formulaContent = `[標準体重]\n${std.formula}\n\n[必要水分量]\n${req.formulaFluid}\n目安: ${req.fluid.toFixed(0)} mL/day\n\n[必要エネルギー (推定)]\n${req.formulaEnergy}\n目安: ${req.energy.toFixed(0)} kcal/day\n\n[Schofieldの式]\n${schofield.formula}\n結果: ${schofield.energy.toFixed(0)} kcal/day\n\n[WHOの式]\n${who.formula}\n結果: ${who.energy.toFixed(0)} kcal/day\n(出典: 日本版重症患者の栄養療法ガイドライン2024)\n\n[目標エネルギー量 (経静脈栄養)]\n${pnReq.range} ${pnReq.unit}\n(出典: ESPGHAN/ESPEN/ESPR/CSPEN guidelines 2018)`;
             
             // 設定画面側の表示
             const fDisplay = document.getElementById('pediatric-formulas');
