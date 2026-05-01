@@ -85,7 +85,8 @@ input[type="text"], input[type="number"], select {
     font-size: 16px; /* iOSでの自動ズームを防止 */
     background-color: white;
     color: #1f2937;
-    -webkit-appearance: none; /* Safariのデフォルトスタイルをリセット */
+    margin: 0; /* マージンをリセットしてズレを防止 */
+    -webkit-appearance: none; /* Safari of default style reset */
     appearance: none;
 }
 
