@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>栄養管理・輸液計算アプリ</title>
+    <link rel="stylesheet" href="style.css?v=1.6">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="tab-container">
+                <button class="tab-button active" onclick="switchTab('calculator')" aria-label="計算機">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                        <line x1="8" y1="6" x2="16" y2="6"></line>
+                        <line x1="16" y1="14" x2="16" y2="18"></line>
+                        <path d="M16 10h.01"></path>
+                        <path d="M12 10h.01"></path>
+                        <path d="M8 10h.01"></path>
+                        <path d="M12 14h.01"></path>
+                        <path d="M8 14h.01"></path>
+                        <path d="M12 18h.01"></path>
+                        <path d="M8 18h.01"></path>
+                    </svg>
+                </button>
+                <button class="tab-button" onclick="switchTab('settings')" aria-label="設定">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="tab-calculator" class="tab-content active">
+                <div class="glass-panel">
+                    <h1>栄養管理・輸液計算</h1>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="input-group">
+                            <label for="pt-name">氏名</label>
+                            <input type="text" id="pt-name" placeholder="患者名">
+                        </div>
+                        <div class="input-group">
+                            <label for="pt-id">ID</label>
+                            <input type="text" id="pt-id" placeholder="123456">
+                        </div>
+                        <div class="input-group">
+                            <label for="pt-age">年齢 (歳)</label>
+                            <input type="number" id="pt-age" placeholder="25">
+                        </div>
+                        <div class="input-group">
+                            <label for="pt-gender">性別</label>
+                            <select id="pt-gender">
+                                <option value="male">男性</option>
+                                <option value="female">女性</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="pt-height">身長 (cm)</label>
+                            <input type="number" id="pt-height" placeholder="160">
+                        </div>
+                        <div class="input-group">
+                            <label for="pt-weight">体重 (kg)</label>
+                            <input type="number" id="pt-weight" placeholder="50">
+                        </div>
+                    </div>
+
+                    <div class="patient-metrics" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <div class="metric-item">
+                                <span class="label">BMI:</span>
+                                <span class="value" id="disp-bmi">-</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="label">標準体重 (IBW):</span>
+                                <span class="value" id="disp-ibw">-</span>
+                                <span class="unit">kg</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <span class="label" id="target-kcal-label">目標カロリー (25kcal/kg/day):</span>
+                            <div style="display: flex; gap: 20px; font-size: 0.9em; margin-top: 5px;">
+                                <div>実体重: <span id="target-kcal-act">-</span> kcal</div>
+                                <div>標準体重: <span id="target-kcal-ibw">-</span> kcal</div>
+                            </div>
+                        </div>
+
+                        <div id="pediatric-formula-info" style="display: none; margin-top: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 8px; border: 1px solid #bbdefb;">
+                            <div style="font-weight: bold; color: #1565c0; margin-bottom: 5px;">小児用計算基準</div>
+                            <div id="pediatric-formula-text" style="font-size: 0.85em; white-space: pre-wrap; color: #333;"></div>
+                        </div>
+
+                        <div id="obesity-guidelines" style="display: none; margin-top: 15px; padding: 10px; background-color: #fff3e0; border-radius: 8px; border: 1px solid #ffe0b2;">
+                            <div style="font-weight: bold; color: #e65100; margin-bottom: 5px;">肥満ガイドライン (ASPEN 2016)</div>
+                            <div style="font-size: 0.9em;">
+                                <div>目標エネルギー: <span id="obesity-target-kcal">-</span></div>
+                                <div style="color: #666; font-size: 0.85em; margin-bottom: 3px;" id="obesity-kcal-detail"></div>
+                                <div>目標タンパク質: <span id="obesity-target-protein">-</span></div>
+                                <div style="color: #666; font-size: 0.85em;" id="obesity-protein-detail"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="nutrition-inputs"></div>
+            </div>
+
+            <div id="tab-settings" class="tab-content">
+                <div class="glass-panel">
+                    <button id="btn-save-settings" class="btn-primary" style="width: 100%; margin-top: 15px; margin-bottom: 20px;">設定を保存する</button>
+                    <h2>表示設定</h2>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">計算機に表示する製剤を選択してください。</p>
+                    <div id="settings-product-list"></div>
+                </div>
+
+                <div class="glass-panel">
+                    <h2>計算式と基準 (小児)</h2>
+                    <div id="pediatric-formulas" class="formula-display">
+                        <p style="color: #666;">年齢を入力すると、使用された標準体重の計算式や必要栄養量の基準が表示されます。</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <h2>製剤の追加</h2>
+                    <div class="input-group">
+                        <label>製剤名</label>
+                        <input type="text" id="cust-name">
+                    </div>
+                    <div class="input-group">
+                        <label>カテゴリ</label>
+                        <select id="cust-cat">
+                            <option value="enteral">経腸栄養剤</option>
+                            <option value="infant_formula">乳児用ミルク</option>
+                            <option value="ppn">末梢静脈栄養</option>
+                            <option value="tpn">高カロリー輸液</option>
+                            <option value="amino_acid">アミノ酸製剤</option>
+                            <option value="fat_emulsion">脂肪製剤</option>
+                            <option value="micronutrients">ビタミン・ミネラル</option>
+                            <option value="supplements">栄養機能食品</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="input-group"><label>単位</label><input type="text" id="cust-unit" placeholder="mL"></div>
+                        <div class="input-group"><label>1単位あたりの容量</label><input type="number" id="cust-vol" placeholder="1.0" step="0.1"></div>
+                        <div class="input-group"><label>Kcal</label><input type="number" id="cust-kcal" step="0.01"></div>
+                        <div class="input-group"><label>タンパク質 (g)</label><input type="number" id="cust-pro" step="0.01"></div>
+                        <div class="input-group"><label>Na (mg)</label><input type="number" id="cust-na" step="0.1"></div>
+                        <div class="input-group"><label>水分 (mL/g)</label><input type="number" id="cust-water" step="0.01"></div>
+                        <div class="input-group"><label>鉄 Fe (mg)</label><input type="number" id="cust-fe" step="0.001"></div>
+                        <div class="input-group"><label>亜鉛 Zn (mg)</label><input type="number" id="cust-zn" step="0.001"></div>
+                        <div class="input-group"><label>銅 Cu (mg)</label><input type="number" id="cust-cu" step="0.001"></div>
+                        <div class="input-group"><label>マンガン Mn (mg)</label><input type="number" id="cust-mn" step="0.001"></div>
+                        <div class="input-group"><label>ヨウ素 I (mg)</label><input type="number" id="cust-i" step="0.0001"></div>
+                        <div class="input-group"><label>ビタミンB1 (mg)</label><input type="number" id="cust-b1" step="0.001"></div>
+                        <div class="input-group"><label>カルニチン (mg)</label><input type="number" id="cust-carnitine" step="0.1"></div>
+                    </div>
+                    <button id="btn-add-custom" class="btn-primary" style="width: 100%; margin-top: 15px;">追加する</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-panel glass-panel">
+            <h2>計算結果</h2>
+            <div class="result-card">
+                <h3>主要項目</h3>
+                <div class="result-grid-major">
+                    <div class="result-item"><div class="result-label">エネルギー</div><span class="result-value" id="total-kcal">0</span><span class="result-unit">kcal</span><div class="result-sub" id="kcal-per-kg">0 kcal/kg</div></div>
+                    <div class="result-item"><div class="result-label">タンパク質</div><span class="result-value" id="total-protein">0</span><span class="result-unit">g</span><div class="result-sub" id="protein-per-kg">0 g/kg</div></div>
+                    <div class="result-item"><div class="result-label">総液量</div><span class="result-value" id="total-volume">0</span><span class="result-unit">mL</span><div class="result-sub" id="volume-per-kg">0 mL/kg</div></div>
+                    <div class="result-item"><div class="result-label">総水分量</div><span class="result-value" id="total-water">0</span><span class="result-unit">mL</span><div class="result-sub" id="water-per-kg">0 mL/kg</div></div>
+                    <div class="result-item"><div class="result-label">食塩相当量</div><span class="result-value" id="total-salt">0</span><span class="result-unit">g</span><div class="result-sub" id="salt-per-kg">0 g/kg</div></div>
+                    <div class="result-item"><div class="result-label">NPC/N比</div><span class="result-value" id="total-npcn">0</span></div>
+                </div>
+            </div>
+            <div class="result-card">
+                <h3>微量元素・その他</h3>
+                <div class="trace-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9rem;">
+                    <div>鉄 (Fe): <span id="total-fe">0</span> mg</div>
+                    <div>亜鉛 (Zn): <span id="total-zn">0</span> mg</div>
+                    <div>銅 (Cu): <span id="total-cu">0</span> mg</div>
+                    <div>マンガン (Mn): <span id="total-mn">0</span> mg</div>
+                    <div>ヨウ素 (I): <span id="total-i">0</span> µg</div>
+                    <div>ビタミンB1: <span id="total-b1">0</span> mg</div>
+                    <div>カルニチン: <span id="total-carnitine">0</span> mg</div>
+                </div>
+            </div>
+            <table class="summary-table">
+                <tr><td>経腸栄養</td><td id="sub-enteral">0 kcal</td></tr>
+                <tr><td>静脈栄養 (PPN+TPN)</td><td id="sub-pn">0 kcal</td></tr>
+            </table>
+            <button id="btn-copy" class="btn-primary" style="margin-top: 15px; width: 100%;">結果をコピー</button>
+        </div>
+    </div>
+    <script type="module" src="main.js?v=1.6"></script>
+</body>
+</html>
